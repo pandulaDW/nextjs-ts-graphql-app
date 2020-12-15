@@ -1,4 +1,9 @@
 import { ApolloServer, gql, IResolvers } from "apollo-server-micro";
+import mysql from "serverless-mysql";
+
+interface ApolloContext {
+  db: mysql.ServerlessMysql;
+}
 
 const typeDefs = gql`
   enum TaskStatus {
@@ -34,9 +39,14 @@ const typeDefs = gql`
   }
 `;
 
-const resolvers: IResolvers = {
+const resolvers: IResolvers<any, ApolloContext> = {
   Query: {
-    tasks(parent, args, context) {
+    async tasks(parent, args, context) {
+      const result = await context.db.query(
+        'SELECT "HELLO WORLD" AS hello_world'
+      );
+      await db.end();
+      console.log({ result });
       return [];
     },
     task(parent, args, context) {
@@ -56,7 +66,16 @@ const resolvers: IResolvers = {
   },
 };
 
-const apolloServer = new ApolloServer({ typeDefs, resolvers });
+const db = mysql({
+  config: {
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
+  },
+});
+
+const apolloServer = new ApolloServer({ typeDefs, resolvers, context: { db } });
 
 export const config = {
   api: {
