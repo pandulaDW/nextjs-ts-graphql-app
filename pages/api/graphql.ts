@@ -12,11 +12,11 @@ const typeDefs = gql`
     status: TaskStatus!
   }
 
-  type CreateTaskInput {
+  input CreateTaskInput {
     title: String!
   }
 
-  type UpdateTaskInput {
+  input UpdateTaskInput {
     id: Int!
     title: String
     status: TaskStatus
